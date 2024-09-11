@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:qr_scanner/cores/services/VibrationService.dart';
 import 'package:qr_scanner/cores/utils.dart';
 
 class ScanQrPage extends StatefulWidget {
@@ -31,12 +32,15 @@ class _ScanQrPageState extends State<ScanQrPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+      
+        backgroundColor: const Color.fromARGB(255, 150, 106, 227),
         actions: [
           IconButton(
             color: Colors.red,
             iconSize: 32,
-            onPressed: () {},
+            onPressed: () {
+              _cameraController.toggleTorch();
+            },
             icon: ValueListenableBuilder<TorchState>(
                 valueListenable: _cameraController.torchState,
                 builder: (context, state, child) {
@@ -45,23 +49,24 @@ class _ScanQrPageState extends State<ScanQrPage> {
                       LogDetails.Logging("Turning off torch!");
                       return const Icon(
                         Icons.flash_off,
-                        color: Colors.grey,
+                        color: Colors.black87,
                       );
 
                     case TorchState.on:
                       LogDetails.Logging("Turning on torch!");
                       return const Icon(
                         Icons.flash_on_outlined,
-                        color: Colors.white,
+                        color: Colors.orange,
                       );
                   }
                 }),
           ),
           IconButton(
               color: Colors.red,
-              iconSize:
-               32,
-              onPressed: () {},
+              iconSize: 32,
+              onPressed: () {
+                // _cameraController.switchCamera();
+              },
               icon: ValueListenableBuilder<CameraFacing>(
                 valueListenable: _cameraController.cameraFacingState,
                 builder: (context, state, child) {
@@ -70,14 +75,14 @@ class _ScanQrPageState extends State<ScanQrPage> {
                       LogDetails.Logging("Facing camera back!");
                       return const Icon(
                         Icons.camera_rear,
-                        color: Colors.white,
+                        color: Colors.black87,
                       );
 
                     case CameraFacing.front:
                       LogDetails.Logging("Facing camera front!");
                       return const Icon(
                         Icons.camera_front,
-                        color: Colors.white,
+                        color: Colors.black87,
                       );
                   }
                 },
@@ -86,7 +91,7 @@ class _ScanQrPageState extends State<ScanQrPage> {
       ),
       body: SafeArea(
         child: MobileScanner(
-          
+          allowDuplicates: true,
             controller: _cameraController, onDetect: _captureCode),
       ),
     );
@@ -94,5 +99,9 @@ class _ScanQrPageState extends State<ScanQrPage> {
 
   void _captureCode(Barcode code, MobileScannerArguments? args) {
     LogDetails.Logging("Captured!");
+    if (code.format == BarcodeFormat.qrCode) {
+      LogDetails.Logging(code.rawValue ?? "****nothing****");
+      VibrationService.induceVibration();
+    }
   }
 }
