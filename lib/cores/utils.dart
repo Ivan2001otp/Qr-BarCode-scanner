@@ -13,7 +13,7 @@ class LogDetails {
 
 class DateTimeUtils {
  static String dateTimeToString(DateTime value) {
-    String format = 'yyyy-MM-dd HH:mm:ss';
+    String format = 'EEE dd, yyyy HH:mm:ss a';
     final formatter = DateFormat(format);
     return formatter.format(value);
   }
