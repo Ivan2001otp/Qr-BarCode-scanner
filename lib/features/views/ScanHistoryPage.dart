@@ -55,7 +55,7 @@ class _ScanHistoryPageState extends State<ScanHistoryPage> {
               return ListView.separated(
                   itemCount: data.length,
                   separatorBuilder: (context, index) {
-                    return Divider(
+                    return const Divider(
                       thickness: 2,
                       indent: 4,
                       endIndent: 4,
@@ -63,7 +63,7 @@ class _ScanHistoryPageState extends State<ScanHistoryPage> {
                   },
                   itemBuilder: (context, index) {
                     if (data.isEmpty) {
-                      return Center(
+                      return const Center(
                         child: Text(
                           "No Scans History!",
                           style: TextStyle(color: Colors.grey, fontSize: 18),
