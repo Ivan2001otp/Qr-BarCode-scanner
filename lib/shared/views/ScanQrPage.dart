@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:qr_scanner/cores/services/VibrationService.dart';
 import 'package:qr_scanner/cores/utils.dart';
+import 'package:rxdart/rxdart.dart';
 
 class ScanQrPage extends StatefulWidget {
   const ScanQrPage({super.key});
@@ -12,6 +13,8 @@ class ScanQrPage extends StatefulWidget {
 
 class _ScanQrPageState extends State<ScanQrPage> {
   late MobileScannerController _cameraController;
+  bool scanned = false;
+  final _debounceSubject = BehaviorSubject<Barcode>();
 
   @override
   void initState() {
@@ -19,20 +22,33 @@ class _ScanQrPageState extends State<ScanQrPage> {
     super.initState();
 
     _cameraController = MobileScannerController();
+    _debounceSubject
+        .debounceTime(const Duration(hours: 1))
+        .listen((event) async {
+      
+      LogDetails.Logging(event.rawValue ?? "****nothing****");
+      LogDetails.Logging("Time dependent URl is $GenerateTimeDependentUrl()");
+
+      await VibrationService.induceVibration();
+      scanned = true;
+    });
   }
 
   @override
   void dispose() {
     _cameraController.dispose();
-    // TODO: implement dispose
+    _debounceSubject.close();
     super.dispose();
+  }
+
+  String GenerateTimeDependentUrl() {
+    return "URL${DateTime.now().toIso8601String()}";
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-      
         backgroundColor: const Color.fromARGB(255, 150, 106, 227),
         actions: [
           IconButton(
@@ -92,16 +108,20 @@ class _ScanQrPageState extends State<ScanQrPage> {
       body: SafeArea(
         child: MobileScanner(
           allowDuplicates: true,
-            controller: _cameraController, onDetect: _captureCode),
+          controller: _cameraController,
+          onDetect: _captureCode,
+        ),
       ),
     );
   }
 
-  void _captureCode(Barcode code, MobileScannerArguments? args) {
+  void _captureCode(Barcode code, MobileScannerArguments? args) async {
     LogDetails.Logging("Captured!");
-    if (code.format == BarcodeFormat.qrCode) {
-      LogDetails.Logging(code.rawValue ?? "****nothing****");
-      VibrationService.induceVibration();
+
+    if (!scanned) {
+      _debounceSubject.add(code);
+
+      // scanned = true;
     }
   }
 }
