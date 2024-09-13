@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:qr_scanner/cores/services/VibrationService.dart';
 import 'package:qr_scanner/cores/utils.dart';
+import 'package:qr_scanner/features/provider/ScannedCodeProvider.dart';
+import 'package:qr_scanner/shared/Constants.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:provider/provider.dart';
 
 class ScanQrPage extends StatefulWidget {
   const ScanQrPage({super.key});
@@ -14,6 +17,8 @@ class ScanQrPage extends StatefulWidget {
 class _ScanQrPageState extends State<ScanQrPage> {
   late MobileScannerController _cameraController;
   bool scanned = false;
+  late ScannedCodeProvider scannedCodeProvider;
+
   final _debounceSubject = BehaviorSubject<Barcode>();
 
   @override
@@ -23,21 +28,44 @@ class _ScanQrPageState extends State<ScanQrPage> {
 
     _cameraController = MobileScannerController();
     _debounceSubject
-        .debounceTime(const Duration(seconds: 5))
+        .debounceTime(const Duration(milliseconds: 500))
         .listen((event) async {
+      String codeValue = event.rawValue ?? NOTHING;
+      scannedCodeProvider.value = codeValue;
+
+      if (event.format == BarcodeFormat.qrCode) {
+        scannedCodeProvider.scannedCodeType = QRCODE;
+      } else {
+        scannedCodeProvider.scannedCodeType = BARCODE;
+      }
+
+      debugPrint(scannedCodeProvider.value);
+
       LogDetails.Logging(event.rawValue ?? "****nothing****");
-      LogDetails.Logging(GenerateTimeDependentUrl());
-      ToastUtils.showToast("Qr scanned successfully");
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12),),),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(
+              Radius.circular(12),
+            ),
+          ),
           backgroundColor: Colors.green,
-          content: Text('QR scanned successfully!'),
+          content: Text(
+            'QR scanned successfully!',
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+            ),
+          ),
           duration: Duration(seconds: 3),
         ),
       );
       await VibrationService.induceVibration();
       scanned = true;
+
+      
+
+      Navigator.of(context).pop();
     });
   }
 
@@ -48,15 +76,14 @@ class _ScanQrPageState extends State<ScanQrPage> {
     super.dispose();
   }
 
-  String GenerateTimeDependentUrl() {
-    return "URL${DateTime.now()}";
-  }
-
   @override
   Widget build(BuildContext context) {
+    scannedCodeProvider =
+        Provider.of<ScannedCodeProvider>(context, listen: false);
+
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 150, 106, 227),
+        backgroundColor: Color.fromARGB(255, 185, 154, 238),
         actions: [
           IconButton(
             color: Colors.red,
@@ -72,7 +99,7 @@ class _ScanQrPageState extends State<ScanQrPage> {
                       LogDetails.Logging("Turning off torch!");
                       return const Icon(
                         Icons.flash_off,
-                        color: Colors.black87,
+                        color: Colors.white,
                       );
 
                     case TorchState.on:
@@ -84,37 +111,14 @@ class _ScanQrPageState extends State<ScanQrPage> {
                   }
                 }),
           ),
-          IconButton(
-              color: Colors.red,
-              iconSize: 32,
-              onPressed: () {
-                // _cameraController.switchCamera();
-              },
-              icon: ValueListenableBuilder<CameraFacing>(
-                valueListenable: _cameraController.cameraFacingState,
-                builder: (context, state, child) {
-                  switch (state) {
-                    case CameraFacing.back:
-                      LogDetails.Logging("Facing camera back!");
-                      return const Icon(
-                        Icons.camera_rear,
-                        color: Colors.black87,
-                      );
-
-                    case CameraFacing.front:
-                      LogDetails.Logging("Facing camera front!");
-                      return const Icon(
-                        Icons.camera_front,
-                        color: Colors.black87,
-                      );
-                  }
-                },
-              ))
+          const SizedBox( 
+            width: 30,
+          ),
         ],
       ),
       body: SafeArea(
         child: MobileScanner(
-          allowDuplicates: true,
+          allowDuplicates: false,
           controller: _cameraController,
           onDetect: _captureCode,
         ),
@@ -123,12 +127,10 @@ class _ScanQrPageState extends State<ScanQrPage> {
   }
 
   void _captureCode(Barcode code, MobileScannerArguments? args) async {
-    LogDetails.Logging("Captured!");
-
     if (!scanned) {
-      _debounceSubject.add(code);
+      LogDetails.Logging("Captured!");
 
-      // scanned = true;
+      _debounceSubject.add(code);
     }
   }
 }

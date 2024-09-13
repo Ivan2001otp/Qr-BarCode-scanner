@@ -8,22 +8,6 @@ class LogDetails {
     debugPrint(data);
   }
 }
-
-class ToastUtils {
-  static void showToast(String message,
-      {ToastGravity gravity = ToastGravity.BOTTOM,
-      Toast length = Toast.LENGTH_SHORT}) {
-    Fluttertoast.showToast(
-      msg: message,
-      toastLength: length,
-      gravity: gravity,
-      backgroundColor: Colors.grey[800],
-      textColor: Colors.white,
-      fontSize: 16,
-    );
-  }
-}
-
 class PermissionUtils {
   Future<bool> commandCameraPermissionStatus() async {
     PermissionStatus cameraStatus = await Permission.camera.status;
