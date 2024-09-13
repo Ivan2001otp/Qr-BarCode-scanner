@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:qr_scanner/cores/utils.dart';
 import 'package:qr_scanner/features/provider/ScannedCodeProvider.dart';
 import 'package:qr_scanner/features/views/DynamicQrGeneratePage.dart';
+import 'package:qr_scanner/features/views/ScanHistoryPage.dart';
 import 'package:qr_scanner/features/views/ScanQrPage.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -97,8 +98,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.deepPurple,
                   ),
-                  onPressed: () async{
-                  await  Navigator.of(context).push(
+                  onPressed: () async {
+                    await Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (context) => const GenerateQRcodePage(),
                       ),
@@ -116,9 +117,14 @@ class _MyHomePageState extends State<MyHomePage> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.deepPurple,
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                          builder: (context) => const ScanHistoryPage()),
+                    );
+                  },
                   child: const Text(
-                    'History Scans',
+                    'Scan History',
                     style: TextStyle(color: Colors.white),
                   ),
                 )

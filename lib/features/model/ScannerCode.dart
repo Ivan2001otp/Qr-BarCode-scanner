@@ -9,6 +9,14 @@ class ScannerCode {
     required this.scannedCodeType,
   });
 
+  static ScannerCode fromSnapshot(Map<String, dynamic> map) {
+    return ScannerCode(
+      url: map['url'],
+      scannedTime: map['scannedTime'],
+      scannedCodeType: map['scannedCodeType'],
+    );
+  }
+
   Map<String, dynamic> toJson() {
     return {
       "url": url,
@@ -16,6 +24,4 @@ class ScannerCode {
       "scannedCodeType": scannedCodeType
     };
   }
-
-  
 }

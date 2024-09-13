@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "863600410037",
+    "project_id": "flutter-firebase-cee42",
+    "storage_bucket": "flutter-firebase-cee42.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:863600410037:android:aed78d03b6b375ea45adfc",
+        "android_client_info": {
+          "package_name": "com.example.firebase_flutter_1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBsH_bYpxLLmggao2HCr9W6SO_WlM_jy5w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:863600410037:android:65ffb82b07ffc18c45adfc",
+        "android_client_info": {
+          "package_name": "com.example.qr_scanner"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBsH_bYpxLLmggao2HCr9W6SO_WlM_jy5w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:qr_scanner/cores/database/remote/scannerRepository.dart';
+import 'package:qr_scanner/cores/enum/enums.dart';
 import 'package:qr_scanner/cores/services/VibrationService.dart';
 import 'package:qr_scanner/cores/utils.dart';
 import 'package:qr_scanner/features/provider/ScannedCodeProvider.dart';
@@ -15,6 +18,7 @@ class ScanQrPage extends StatefulWidget {
 }
 
 class _ScanQrPageState extends State<ScanQrPage> {
+  late ScannerRepository repository;
   late MobileScannerController _cameraController;
   bool scanned = false;
   late ScannedCodeProvider scannedCodeProvider;
@@ -27,9 +31,12 @@ class _ScanQrPageState extends State<ScanQrPage> {
     super.initState();
 
     _cameraController = MobileScannerController();
+    repository = ScannerRepository();
     _debounceSubject
         .debounceTime(const Duration(milliseconds: 500))
         .listen((event) async {
+      EasyLoading.show(status: "Saving...");
+
       String codeValue = event.rawValue ?? NOTHING;
       scannedCodeProvider.value = codeValue;
 
@@ -60,10 +67,33 @@ class _ScanQrPageState extends State<ScanQrPage> {
           duration: Duration(seconds: 3),
         ),
       );
-      await VibrationService.induceVibration();
+
       scanned = true;
 
-      
+      bool result = await repository.saveQrHistory(
+          codeValue,
+          DateTime.now(),
+          scannedCodeProvider.scannedCodeType == QRCODE
+              ? ScanType.qrcode
+              : ScanType.barcode);
+
+      if (result) {
+        LogDetails.Logging("ivan-Successfully saved!");
+        EasyLoading.showSuccess("Saved to history !");
+      } else {
+        LogDetails.Logging("ivan -Something went wrong");
+        EasyLoading.showError("Something went wrong !");
+      }
+
+      await Future.delayed(
+       const Duration(seconds: 2),
+      );
+
+      await VibrationService.induceVibration();
+
+      if (context.mounted) {
+        EasyLoading.dismiss();
+      }
 
       Navigator.of(context).pop();
     });
@@ -111,7 +141,7 @@ class _ScanQrPageState extends State<ScanQrPage> {
                   }
                 }),
           ),
-          const SizedBox( 
+          const SizedBox(
             width: 30,
           ),
         ],

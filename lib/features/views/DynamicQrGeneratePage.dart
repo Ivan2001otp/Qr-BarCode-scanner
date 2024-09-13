@@ -28,7 +28,7 @@ class _GenerateQRcodePageState extends State<GenerateQRcodePage> {
 
   @override
   Widget build(BuildContext context) {
-      code = generateTimeDependentUrl();
+    code = generateTimeDependentUrl();
 
     return Scaffold(
       body: SafeArea(
@@ -58,7 +58,7 @@ class _GenerateQRcodePageState extends State<GenerateQRcodePage> {
               qrPadding: 16,
               qrBackgroundColor: Colors.black,
               qrForegroundColor: Colors.amber[50],
-              qrBorderRadius: 8,
+             
             ),
           ),
           const SizedBox(
