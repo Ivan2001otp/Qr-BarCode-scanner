@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_scanner/cores/utils.dart';
-import 'package:qr_scanner/shared/views/ScanQrPage.dart';
+import 'package:qr_scanner/features/ScanQrPage.dart';
 
 void main() {
   runApp(const MyApp());

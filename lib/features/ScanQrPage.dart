@@ -23,12 +23,19 @@ class _ScanQrPageState extends State<ScanQrPage> {
 
     _cameraController = MobileScannerController();
     _debounceSubject
-        .debounceTime(const Duration(hours: 1))
+        .debounceTime(const Duration(seconds: 5))
         .listen((event) async {
-      
       LogDetails.Logging(event.rawValue ?? "****nothing****");
-      LogDetails.Logging("Time dependent URl is $GenerateTimeDependentUrl()");
-
+      LogDetails.Logging(GenerateTimeDependentUrl());
+      ToastUtils.showToast("Qr scanned successfully");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12),),),
+          backgroundColor: Colors.green,
+          content: Text('QR scanned successfully!'),
+          duration: Duration(seconds: 3),
+        ),
+      );
       await VibrationService.induceVibration();
       scanned = true;
     });
@@ -42,7 +49,7 @@ class _ScanQrPageState extends State<ScanQrPage> {
   }
 
   String GenerateTimeDependentUrl() {
-    return "URL${DateTime.now().toIso8601String()}";
+    return "URL${DateTime.now()}";
   }
 
   @override
